@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="row">
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body">
+                <div class="text-center mb-3">
+                    {% if user.profile_image %}
+                        <img src="{{ user.profile_image }}" class="rounded-circle mb-3" width="150" height="150">
+                    {% else %}
+                        <div class="profile-placeholder mb-3">
+                            <i class="bi bi-person-circle" style="font-size: 150px;"></i>
+                        </div>
+                    {% endif %}
+                    
+                    <h5 class="card-title">
+                        {{ user.display_name if user.is_verified else user.username }}
+                        {% if user.is_verified %}
+                            <span class="verified-badge">✓</span>
+                        {% endif %}
+                    </h5>
+                </div>
+
+                {% if session.get('user_id') == user.id %}
+                    <form action="/profile/update" method="post" enctype="multipart/form-data" class="mb-3">
+                        <div class="mb-3">
+                            <label for="profile_image" class="form-label">Update Profile Image</label>
+                            <input type="file" class="form-control" id="profile_image" name="profile_image" accept="image/*">
+                        </div>
+                        <button type="submit" class="btn btn-rebs w-100">Update Profile</button>
+                    </form>
+                {% endif %}
+
+                {% if user.is_verified and session.get('user_id') != user.id %}
+                    {% if not is_subscribed %}
+                        <button class="btn btn-rebs w-100 subscribe-btn" data-creator-id="{{ user.id }}">
+                            Subscribe
+                        </button>
+                    {% else %}
+                        <button class="btn btn-secondary w-100" disabled>
+                            Subscribed
+                        </button>
+                    {% endif %}
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-8">
+        {% for post in posts %}
+            <div class="card mb-4" id="post-{{ post.id }}">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <div class="d-flex align-items-center">
+                            {% if user.profile_image %}
+                                <img src="{{ user.profile_image }}" class="rounded-circle me-2" width="32" height="32">
+                            {% else %}
+                                <i class="bi bi-person-circle me-2" style="font-size: 32px;"></i>
+                            {% endif %}
+                            <div>
+                                <h6 class="card-subtitle">
+                                    {{ post.display_name if post.is_verified else post.username }}
+                                    {% if post.is_verified %}
+                                        <span class="verified-badge">✓</span>
+                                    {% endif %}
+                                </h6>
+                                <small class="text-muted">{{ post.created_at }}</small>
+                            </div>
+                        </div>
+                        
+                        {% if session.get('user_id') == post.user_id %}
+                            <div class="dropdown">
+                                <button class="btn btn-link text-muted" data-bs-toggle="dropdown">
+                                    <i class="bi bi-three-dots-vertical"></i>
+                                </button>
+                                <ul class="dropdown-menu dropdown-menu-end">
+                                    <li>
+                                        <button class="dropdown-item" onclick="initPostEditor({{ post.id }})">
+                                            Edit
+                                        </button>
+                                    </li>
+                                    <li>
+                                        <button class="dropdown-item text-danger" onclick="deletePost({{ post.id }})">
+                                            Delete
+                                        </button>
+                                    </li>
+                                </ul>
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    <p class="card-text post-content">{{ post.content }}</p>
+                    {% if post.media_path %}
+                        <img src="/{{ post.media_path }}" class="img-fluid post-image mb-3">
+                    {% endif %}
+                    
+                    <div class="d-flex gap-3 mb-3">
+                        <button class="btn btn-outline-danger btn-sm like-btn" 
+                                data-post-id="{{ post.id }}"
+                                onclick="toggleLike({{ post.id }})">
+                            <i class="bi bi-heart{% if post.is_liked %}-fill{% endif %}"></i>
+                            <span class="likes-count">{{ post.likes_count }}</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        {% else %}
+            <div class="text-center text-muted">
+                No posts yet.
+            </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

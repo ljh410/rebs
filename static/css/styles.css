@@ -1,0 +1,50 @@
+/* static/css/styles.css */
+:root {
+    --rebs-red: #dc3545;
+    --rebs-dark: #212529;
+}
+
+[data-theme="dark"] {
+    --bg-main: #1a1a1a;
+    --bg-secondary: #2d2d2d;
+    --text-main: #ffffff;
+    --text-secondary: #b0b0b0;
+}
+
+[data-theme="light"] {
+    --bg-main: #ffffff;
+    --bg-secondary: #f8f9fa;
+    --text-main: #212529;
+    --text-secondary: #6c757d;
+}
+
+body {
+    background-color: var(--bg-main);
+    color: var(--text-main);
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.card {
+    background-color: var(--bg-secondary);
+    border: none;
+}
+
+.navbar-rebs {
+    background-color: var(--rebs-dark);
+}
+
+.notification-badge {
+    position: absolute;
+    top: 0;
+    right: 0;
+    transform: translate(50%, -50%);
+}
+
+.notification-item {
+    border-bottom: 1px solid var(--text-secondary);
+    padding: 10px;
+}
+
+.notification-item:last-child {
+    border-bottom: none;
+}

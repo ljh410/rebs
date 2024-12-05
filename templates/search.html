@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="row mb-4">
+    <div class="col">
+        <form class="d-flex">
+            <input type="search" name="q" class="form-control me-2" value="{{ query }}" placeholder="Search posts...">
+            <select name="filter" class="form-select me-2" style="width: auto;">
+                <option value="all">All Posts</option>
+                <option value="verified">Verified Only</option>
+                <option value="popular">Most Popular</option>
+            </select>
+            <button type="submit" class="btn btn-rebs">Search</button>
+        </form>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        {% for post in posts %}
+            <!-- Post card template from index.html -->
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

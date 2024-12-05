@@ -1,0 +1,121 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="row">
+    {% if session.get('user_id') %}
+        <div class="col-md-4 mb-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Create Post</h5>
+                    <form action="/post" method="post" enctype="multipart/form-data">
+                        <div class="mb-3">
+                            <textarea class="form-control" name="content" placeholder="What's on your mind?" rows="3" required></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <input type="file" class="form-control" name="media" accept="image/*,video/*">
+                        </div>
+                        <button type="submit" class="btn btn-rebs">Post</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+    
+    <div class="col-md-8">
+        {% for post in posts %}
+            <div class="card mb-4" id="post-{{ post.id }}">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <div class="d-flex align-items-center">
+                            {% if post.profile_image %}
+                                <img src="{{ post.profile_image }}" class="rounded-circle me-2" width="32" height="32">
+                            {% else %}
+                                <i class="bi bi-person-circle me-2" style="font-size: 32px;"></i>
+                            {% endif %}
+                            <div>
+                                <h6 class="card-subtitle">
+                                    {{ post.display_name if post.is_verified else post.username }}
+                                    {% if post.is_verified %}
+                                        <span class="verified-badge">✓</span>
+                                    {% endif %}
+                                </h6>
+                                <small class="text-muted">{{ post.created_at }}</small>
+                            </div>
+                        </div>
+                        
+                        {% if session.get('user_id') == post.user_id %}
+                            <div class="dropdown">
+                                <button class="btn btn-link text-muted" data-bs-toggle="dropdown">
+                                    <i class="bi bi-three-dots-vertical"></i>
+                                </button>
+                                <ul class="dropdown-menu dropdown-menu-end">
+                                    <li>
+                                        <button class="dropdown-item" onclick="initPostEditor({{ post.id }})">
+                                            Edit
+                                        </button>
+                                    </li>
+                                    <li>
+                                        <button class="dropdown-item text-danger" onclick="deletePost({{ post.id }})">
+                                            Delete
+                                        </button>
+                                    </li>
+                                </ul>
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    <p class="card-text post-content">{{ post.content }}</p>
+                    {% if post.media_path %}
+                        <img src="/{{ post.media_path }}" class="img-fluid post-image mb-3">
+                    {% endif %}
+                    
+                    <div class="d-flex gap-3 mb-3">
+                        <button class="btn btn-outline-danger btn-sm like-btn" 
+                                data-post-id="{{ post.id }}"
+                                onclick="toggleLike({{ post.id }})">
+                            <i class="bi bi-heart{% if post.is_liked %}-fill{% endif %}"></i>
+                            <span class="likes-count ms-1">{{ post.likes_count or 0 }}</span>
+                        </button>
+                        <button class="btn btn-outline-primary btn-sm bookmark-btn" 
+                                data-post-id="{{ post.id }}"
+                                onclick="toggleBookmark({{ post.id }})">
+                            <i class="bi bi-bookmark{% if post.is_bookmarked %}-fill{% endif %}"></i>
+                        </button>
+                        <button class="btn btn-outline-secondary btn-sm" onclick="sharePost({{ post.id }})">
+                            <i class="bi bi-share"></i>
+                        </button>
+                    </div>
+                    
+                    <div class="comments-section">
+                        {% for comment in post.comments %}
+                            <div class="comment small text-muted mb-2" id="comment-{{ comment.id }}">
+                                <strong>
+                                    {{ comment.display_name if comment.is_verified else comment.username }}
+                                    {% if comment.is_verified %}
+                                        <span class="verified-badge">✓</span>
+                                    {% endif %}
+                                </strong>
+                                {{ comment.content }}
+                                <small class="text-muted ms-2">{{ comment.created_at }}</small>
+                                <button class="btn btn-link btn-sm p-0 ms-2" onclick="replyToComment({{ comment.id }})">
+                                    Reply
+                                </button>
+                            </div>
+                        {% endfor %}
+                        
+                        {% if session.get('user_id') %}
+                            <form class="comment-form" action="/comment" method="post">
+                                <input type="hidden" name="post_id" value="{{ post.id }}">
+                                <div class="input-group input-group-sm">
+                                    <input type="text" class="form-control" name="content" 
+                                           placeholder="Add a comment..." required>
+                                    <button type="submit" class="btn btn-outline-secondary">Post</button>
+                                </div>
+                            </form>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

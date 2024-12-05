@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="row">
+    <div class="col-md-8 mx-auto">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Notifications</h5>
+                {% for notification in notifications %}
+                    <div class="notification-item p-3 {% if not notification.is_read %}bg-light{% endif %}">
+                        {% if notification.type == 'like' %}
+                            <i class="bi bi-heart-fill text-danger"></i>
+                        {% elif notification.type == 'reply' %}
+                            <i class="bi bi-chat-fill text-primary"></i>
+                        {% endif %}
+                        <span>{{ notification.content }}</span>
+                        <small class="text-muted">{{ notification.created_at }}</small>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
